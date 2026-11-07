@@ -431,7 +431,7 @@ async function buildReport(kind){
     const R=W-P-28,L=P+28;let yy=y+20;
     c.textAlign='right';c.fillStyle='#2a1a10';c.font='bold 38px '+FONT;c.fillText(d.o.name,R,yy+44);
     // status pill
-    let lab,bg,fg;const s=d.s;
+    let lab,bg,fg;const s=d.s||{};
     if(d.o.done){lab='مغلقة';bg='#dcfce7';fg='#15803d'}
     else if(s.rem<0){lab='زيادة '+(-s.rem)+' حوض';bg='#fee2e2';fg='#b91c1c'}
     else if(s.rem===0){lab='اكتملت';bg='#fee2e2';fg='#b91c1c'}
