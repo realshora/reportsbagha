@@ -129,6 +129,12 @@ nav a.on{color:var(--pr)}
   <!-- التقارير -->
   <section class="page" id="p-reports">
     <div class="card">
+      <h2>تقرير مخزن الساندوتش</h2>
+      <img class="rimg" id="img-sand" alt="">
+      <button data-share="sand">📤 مشاركة الصورة (واتساب)</button>
+      <div class="row"><button class="sec" data-copy="sand">📋 نسخ الصورة</button><button class="sec" data-save="sand">⬇ حفظ</button></div>
+    </div>
+    <div class="card">
       <h2>تقرير مخزن الفستونة</h2>
       <img class="rimg" id="img-fest" alt="">
       <button data-share="fest">📤 مشاركة الصورة (واتساب)</button>
@@ -174,7 +180,7 @@ nav a.on{color:var(--pr)}
 
 <script>
 const KEY='dyeing-app-v1';
-const SIZES=['1','1.8','2','2.2','2.5','2.8'];
+const SIZES=['1','1.8','2','2.2','2.5','2.7','2.8'];
 const KIND={sand:'ساندوتش',fest:'فستونة',jac:'جاكار'};
 const $=id=>document.getElementById(id);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -397,15 +403,15 @@ $('wipeBtn').onclick=()=>{if(confirm('هتتمسح كل البيانات نها�
 
 
 /* ---------- التقارير (صورة) ---------- */
-const RT={fest:'تقرير مخزن الفستونة',jac:'تقرير مخزن الجاكار'};
+const RT={sand:'تقرير مخزن الساندوتش',fest:'تقرير مخزن الفستونة',jac:'تقرير مخزن الجاكار'};
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
 async function buildReport(kind){
   const W=1080,P=40,FONT='system-ui,Tahoma,Arial,sans-serif';
   const os=S.orders.filter(o=>o.kind===kind&&(!o.done||stockOf(o.id).length));
-  const data=os.map(o=>({o,s:orderStats(o),st:stockOf(o.id)}));
+  const data=kind==='sand'?SIZES.map(z=>({o:{name:z+' سم',w:null},s:null,st:stockOf(z)})):os.map(o=>({o,s:orderStats(o),st:stockOf(o.id)}));
   const HEAD=180,CARD_M=22;
-  const cardH=d=>20+64+46+(d.st.length?d.st.length*54+58:54)+20;
+  const cardH=d=>20+64+(d.s?46:0)+(d.st.length?d.st.length*54+58:54)+20;
   let H=HEAD+30+data.reduce((a,d)=>a+cardH(d)+CARD_M,0)+(data.length?130:140)+30;
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;
   const c=cv.getContext('2d');c.direction='rtl';
@@ -431,17 +437,17 @@ async function buildReport(kind){
     else if(s.rem===0){lab='اكتملت';bg='#fee2e2';fg='#b91c1c'}
     else if(s.lvl==='w'){lab='باقي '+s.rem+' حوض';bg='#fef3c7';fg='#b45309'}
     else{lab='باقي '+s.rem+' حوض';bg='#dcfce7';fg='#15803d'}
-    c.font='bold 28px '+FONT;const tw=c.measureText(lab).width+36;
-    c.fillStyle=bg;rr(c,L,yy+8,tw,48,24);c.fill();c.fillStyle=fg;c.textAlign='center';c.fillText(lab,L+tw/2,yy+43);
+    if(d.s){c.font='bold 28px '+FONT;const tw=c.measureText(lab).width+36;
+    c.fillStyle=bg;rr(c,L,yy+8,tw,48,24);c.fill();c.fillStyle=fg;c.textAlign='center';c.fillText(lab,L+tw/2,yy+43);}
     yy+=64;
-    c.textAlign='right';c.fillStyle='#7a6552';c.font='28px '+FONT;
+    if(d.s){c.textAlign='right';c.fillStyle='#7a6552';c.font='28px '+FONT;
     c.fillText('وارد '+s.inN+' من '+d.o.total+' حوض  •  وزن الحوض المعتاد '+num(d.o.w)+' كجم',R,yy+30);
-    yy+=46;
+    yy+=46;}
     if(!d.st.length){c.fillStyle='#7a6552';c.font='30px '+FONT;c.fillText('لا يوجد رصيد في المخزن',R,yy+36)}
     else{
       let n=0,kg=0;
       d.st.forEach(x=>{
-        const ab=x.w!==d.o.w;
+        const ab=!!d.s&&x.w!==d.o.w;
         c.fillStyle=ab?'#b45309':'#2a1a10';c.font=(ab?'bold ':'')+'34px '+FONT;
         c.textAlign='right';c.fillText(x.n+' حوض بوزن '+num(x.w)+(ab?'  ⚠':''),R,yy+38);
         c.textAlign='left';c.fillText(num(x.n*x.w)+' كجم',L,yy+38);
@@ -467,12 +473,12 @@ async function buildReport(kind){
 }
 const repBlob=async k=>{const cv=await buildReport(k);return new Promise(r=>cv.toBlob(r,'image/png'))};
 async function renderReports(){
-  for(const k of ['fest','jac']){const cv=await buildReport(k);$('img-'+k).src=cv.toDataURL('image/png')}
+  for(const k of ['sand','fest','jac']){const cv=await buildReport(k);$('img-'+k).src=cv.toDataURL('image/png')}
 }
 document.addEventListener('click',async e=>{
   const b=e.target.closest('[data-share],[data-copy],[data-save]');if(!b)return;
   const k=b.dataset.share||b.dataset.copy||b.dataset.save;
-  const name=(k==='fest'?'fastona':'jacquard')+'-stock-'+today()+'.png';
+  const name=({sand:'sandwich',fest:'fastona',jac:'jacquard'}[k])+'-stock-'+today()+'.png';
   const blob=await repBlob(k);
   const save=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('تم حفظ الصورة')};
   if(b.dataset.save!==undefined){save();return}
