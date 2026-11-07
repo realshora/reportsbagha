@@ -34,7 +34,7 @@ button.sm{width:auto;margin:0;padding:7px 12px;font-size:13px}
 .seg input:checked+span.in{border-color:var(--gn);background:var(--gnb);color:var(--gn)}
 .seg input:checked+span.out{border-color:var(--wa);background:var(--wab);color:var(--wa)}
 nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--br);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
-nav a{flex:1;text-align:center;padding:10px 2px;font-size:12px;color:var(--mu);font-weight:700;cursor:pointer}
+nav a{flex:1;text-align:center;padding:10px 2px;font-size:11px;color:var(--mu);font-weight:700;cursor:pointer}
 nav a b{display:block;font-size:20px;margin-bottom:2px}
 nav a.on{color:var(--pr)}
 .alert{border-radius:12px;padding:12px 14px;margin-bottom:10px;font-weight:700;font-size:15px}
@@ -59,6 +59,7 @@ nav a.on{color:var(--pr)}
 .page{display:none}.page.on{display:block}
 #toast{position:fixed;bottom:calc(90px + env(safe-area-inset-bottom,0px));left:12px;right:12px;max-width:600px;margin:auto;background:#1b2430;color:#fff;padding:12px 14px;border-radius:12px;font-weight:700;z-index:9;display:none}
 #toast.w{background:#b45309}#toast.r{background:#b91c1c}
+.rimg{width:100%;border-radius:10px;border:1px solid var(--br);display:block;margin-bottom:4px}
 .hd{display:flex;justify-content:space-between;align-items:center;gap:8px}
 </style>
 </head>
@@ -125,6 +126,22 @@ nav a.on{color:var(--pr)}
     <div id="stockView"></div>
   </section>
 
+  <!-- التقارير -->
+  <section class="page" id="p-reports">
+    <div class="card">
+      <h2>تقرير مخزن الفستونة</h2>
+      <img class="rimg" id="img-fest" alt="">
+      <button data-share="fest">📤 مشاركة الصورة (واتساب)</button>
+      <div class="row"><button class="sec" data-copy="fest">📋 نسخ الصورة</button><button class="sec" data-save="fest">⬇ حفظ</button></div>
+    </div>
+    <div class="card">
+      <h2>تقرير مخزن الجاكار</h2>
+      <img class="rimg" id="img-jac" alt="">
+      <button data-share="jac">📤 مشاركة الصورة (واتساب)</button>
+      <div class="row"><button class="sec" data-copy="jac">📋 نسخ الصورة</button><button class="sec" data-save="jac">⬇ حفظ</button></div>
+    </div>
+  </section>
+
   <!-- الإعدادات -->
   <section class="page" id="p-more">
     <div class="card">
@@ -151,6 +168,7 @@ nav a.on{color:var(--pr)}
   <a data-p="daily" class="on"><b>📝</b>التقرير اليومي</a>
   <a data-p="orders"><b>📋</b>الطلبات</a>
   <a data-p="stock"><b>🏭</b>المخزن</a>
+  <a data-p="reports"><b>🖼️</b>التقارير</a>
   <a data-p="more"><b>⚙️</b>الإعدادات</a>
 </nav>
 
@@ -192,7 +210,7 @@ const refName=e=>{if(e.kind==='sand')return 'ساندوتش '+e.ref+'سم';const
 function go(p){
   document.querySelectorAll('.page').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));
   document.querySelectorAll('nav a').forEach(x=>x.classList.toggle('on',x.dataset.p===p));
-  if(p==='stock')renderStock(); if(p==='orders')renderOrders(); if(p==='daily')renderDay(); if(p==='more')$('sWarn').value=S.settings.warn;
+  if(p==='stock')renderStock(); if(p==='orders')renderOrders(); if(p==='daily')renderDay(); if(p==='more')$('sWarn').value=S.settings.warn; if(p==='reports')renderReports();
   window.scrollTo(0,0);
 }
 document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>go(a.dataset.p));
@@ -376,6 +394,99 @@ $('importFile').onchange=e=>{
   };r.readAsText(f);e.target.value='';
 };
 $('wipeBtn').onclick=()=>{if(confirm('هتتمسح كل البيانات نهائيًا. متأكد؟')&&confirm('تأكيد أخير: مسح الكل؟')){S=blank();save();go('daily');renderAlerts();fillRef();toast('تم المسح')}};
+
+
+/* ---------- التقارير (صورة) ---------- */
+const RT={fest:'تقرير مخزن الفستونة',jac:'تقرير مخزن الجاكار'};
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+async function buildReport(kind){
+  const W=1080,P=40,FONT='system-ui,Tahoma,Arial,sans-serif';
+  const os=S.orders.filter(o=>o.kind===kind&&(!o.done||stockOf(o.id).length));
+  const data=os.map(o=>({o,s:orderStats(o),st:stockOf(o.id)}));
+  const HEAD=180,CARD_M=22;
+  const cardH=d=>20+64+46+(d.st.length?d.st.length*54+58:54)+20;
+  let H=HEAD+30+data.reduce((a,d)=>a+cardH(d)+CARD_M,0)+(data.length?130:140)+30;
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const c=cv.getContext('2d');c.direction='rtl';
+  c.fillStyle='#faf6f0';c.fillRect(0,0,W,H);
+  // header
+  c.fillStyle='#6b3f26';c.fillRect(0,0,W,HEAD);c.fillStyle='#b8873f';c.fillRect(0,HEAD-8,W,8);
+  const lg=await loadImg('logo.png');
+  c.fillStyle='#faf6f0';rr(c,W-P-150,22,150,134,18);c.fill();
+  if(lg){const k=Math.min(130/lg.width,114/lg.height);const w=lg.width*k,h=lg.height*k;c.drawImage(lg,W-P-150+(150-w)/2,22+(134-h)/2,w,h)}
+  c.textAlign='right';c.fillStyle='#fff';c.font='bold 48px '+FONT;c.fillText(RT[kind],W-P-180,82);
+  c.fillStyle='#e8c98f';c.font='32px '+FONT;c.fillText('التاريخ: '+fmtD(today()),W-P-180,134);
+  let y=HEAD+30,TN=0,TK=0;
+  if(!data.length){c.fillStyle='#7a6552';c.textAlign='center';c.font='34px '+FONT;c.fillText('لا توجد طلبيات',W/2,y+60);y+=140}
+  data.forEach(d=>{
+    const h=cardH(d);
+    c.fillStyle='#fff';rr(c,P,y,W-2*P,h,20);c.fill();c.strokeStyle='#e5d8c6';c.lineWidth=2;c.stroke();
+    const R=W-P-28,L=P+28;let yy=y+20;
+    c.textAlign='right';c.fillStyle='#2a1a10';c.font='bold 38px '+FONT;c.fillText(d.o.name,R,yy+44);
+    // status pill
+    let lab,bg,fg;const s=d.s;
+    if(d.o.done){lab='مغلقة';bg='#dcfce7';fg='#15803d'}
+    else if(s.rem<0){lab='زيادة '+(-s.rem)+' حوض';bg='#fee2e2';fg='#b91c1c'}
+    else if(s.rem===0){lab='اكتملت';bg='#fee2e2';fg='#b91c1c'}
+    else if(s.lvl==='w'){lab='باقي '+s.rem+' حوض';bg='#fef3c7';fg='#b45309'}
+    else{lab='باقي '+s.rem+' حوض';bg='#dcfce7';fg='#15803d'}
+    c.font='bold 28px '+FONT;const tw=c.measureText(lab).width+36;
+    c.fillStyle=bg;rr(c,L,yy+8,tw,48,24);c.fill();c.fillStyle=fg;c.textAlign='center';c.fillText(lab,L+tw/2,yy+43);
+    yy+=64;
+    c.textAlign='right';c.fillStyle='#7a6552';c.font='28px '+FONT;
+    c.fillText('وارد '+s.inN+' من '+d.o.total+' حوض  •  وزن الحوض المعتاد '+num(d.o.w)+' كجم',R,yy+30);
+    yy+=46;
+    if(!d.st.length){c.fillStyle='#7a6552';c.font='30px '+FONT;c.fillText('لا يوجد رصيد في المخزن',R,yy+36)}
+    else{
+      let n=0,kg=0;
+      d.st.forEach(x=>{
+        const ab=x.w!==d.o.w;
+        c.fillStyle=ab?'#b45309':'#2a1a10';c.font=(ab?'bold ':'')+'34px '+FONT;
+        c.textAlign='right';c.fillText(x.n+' حوض بوزن '+num(x.w)+(ab?'  ⚠':''),R,yy+38);
+        c.textAlign='left';c.fillText(num(x.n*x.w)+' كجم',L,yy+38);
+        c.strokeStyle='#e5d8c6';c.lineWidth=1.5;c.setLineDash([6,6]);c.beginPath();c.moveTo(L,yy+54);c.lineTo(R,yy+54);c.stroke();c.setLineDash([]);
+        n+=x.n;kg+=x.n*x.w;yy+=54;
+      });
+      yy+=4;
+      c.fillStyle='#6b3f26';c.font='bold 34px '+FONT;
+      c.textAlign='right';c.fillText('الإجمالي: '+n+' حوض',R,yy+40);
+      c.textAlign='left';c.fillText(num(kg)+' كجم',L,yy+40);
+      TN+=n;TK+=kg;
+    }
+    y+=h+CARD_M;
+  });
+  if(data.length){
+    c.fillStyle='#6b3f26';rr(c,P,y+4,W-2*P,100,20);c.fill();
+    c.fillStyle='#fff';c.font='bold 38px '+FONT;
+    c.textAlign='right';c.fillText('إجمالي المخزن: '+TN+' حوض',W-P-28,y+68);
+    c.fillStyle='#e8c98f';c.textAlign='left';c.fillText(num(TK)+' كجم',P+28,y+68);
+  }
+  c.fillStyle='#7a6552';c.font='24px '+FONT;c.textAlign='center';c.fillText('التوحيد إيجيبت للشرائط النسيجية',W/2,H-24);
+  return cv;
+}
+const repBlob=async k=>{const cv=await buildReport(k);return new Promise(r=>cv.toBlob(r,'image/png'))};
+async function renderReports(){
+  for(const k of ['fest','jac']){const cv=await buildReport(k);$('img-'+k).src=cv.toDataURL('image/png')}
+}
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-share],[data-copy],[data-save]');if(!b)return;
+  const k=b.dataset.share||b.dataset.copy||b.dataset.save;
+  const name=(k==='fest'?'fastona':'jacquard')+'-stock-'+today()+'.png';
+  const blob=await repBlob(k);
+  const save=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();toast('تم حفظ الصورة')};
+  if(b.dataset.save!==undefined){save();return}
+  if(b.dataset.copy!==undefined){
+    try{await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);toast('تم نسخ الصورة — الصقها في واتساب')}
+    catch(x){toast('النسخ غير مدعوم هنا — استخدم المشاركة أو الحفظ','w')}
+    return;
+  }
+  const file=new File([blob],name,{type:'image/png'});
+  try{
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:RT[k]});return}
+    save();toast('المشاركة غير مدعومة — تم حفظ الصورة، ابعتها من المعرض','w');
+  }catch(x){if(x.name!=='AbortError')toast('تعذرت المشاركة','r')}
+});
 
 /* ---------- تشغيل ---------- */
 fillRef();renderDay();renderAlerts();
