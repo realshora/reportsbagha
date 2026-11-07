@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6b3f26">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>مخزن الصباغة</title>
+<style>
+:root{--bg:#faf6f0;--card:#fff;--tx:#2a1a10;--mu:#7a6552;--br:#e5d8c6;--pr:#6b3f26;--pr2:#f3e8d9;--gold:#b8873f;--wa:#b45309;--wab:#fef3c7;--rd:#b91c1c;--rdb:#fee2e2;--gn:#15803d;--gnb:#dcfce7}
+@media(prefers-color-scheme:dark){:root{--bg:#1b130e;--card:#261b14;--tx:#f1e8dc;--mu:#b09a84;--br:#3a2b20;--pr:#d8a55c;--pr2:#3a2a1a;--gold:#d8a55c;--wa:#fbbf24;--wab:#3a2e0e;--rd:#f87171;--rdb:#3b1616;--gn:#4ade80;--gnb:#12301c}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;font-size:16px;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px));padding-top:env(safe-area-inset-top,0px)}
+header{background:var(--pr);color:#fff;padding:10px 16px;font-weight:700;font-size:18px;position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;border-bottom:4px solid var(--gold)}
+header img{height:42px;width:auto;background:#faf6f0;border-radius:10px;padding:3px}
+@media(prefers-color-scheme:dark){header{color:#2a1a10}}
+main{max-width:640px;margin:0 auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--br);border-radius:14px;padding:14px;margin-bottom:12px}
+h2{font-size:17px;margin:0 0 10px}
+h3{font-size:15px;margin:0}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 4px}
+input,select{width:100%;padding:12px;border:1px solid var(--br);border-radius:10px;font-size:16px;background:var(--bg);color:var(--tx);font-family:inherit}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+button{font-family:inherit;font-size:16px;border:0;border-radius:10px;padding:13px 16px;background:var(--pr);color:#fff;font-weight:700;width:100%;margin-top:14px;cursor:pointer}
+@media(prefers-color-scheme:dark){button{color:#2a1a10}}
+button.sec{background:var(--pr2);color:var(--pr)}
+button.dng{background:var(--rdb);color:var(--rd)}
+button.sm{width:auto;margin:0;padding:7px 12px;font-size:13px}
+.seg{display:flex;gap:8px}.seg label{flex:1;margin:0;color:var(--tx)}
+.seg input{display:none}
+.seg span{display:block;text-align:center;padding:12px;border:2px solid var(--br);border-radius:10px;font-weight:700}
+.seg input:checked+span.in{border-color:var(--gn);background:var(--gnb);color:var(--gn)}
+.seg input:checked+span.out{border-color:var(--wa);background:var(--wab);color:var(--wa)}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--br);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:6}
+nav a{flex:1;text-align:center;padding:10px 2px;font-size:12px;color:var(--mu);font-weight:700;cursor:pointer}
+nav a b{display:block;font-size:20px;margin-bottom:2px}
+nav a.on{color:var(--pr)}
+.alert{border-radius:12px;padding:12px 14px;margin-bottom:10px;font-weight:700;font-size:15px}
+.alert.w{background:var(--wab);color:var(--wa);border:1px solid var(--wa)}
+.alert.r{background:var(--rdb);color:var(--rd);border:1px solid var(--rd)}
+.item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--br)}
+.item:last-child{border:0}
+.item small{color:var(--mu);display:block;margin-top:2px}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700}
+.tag.in{background:var(--gnb);color:var(--gn)}.tag.out{background:var(--wab);color:var(--wa)}
+.tag.ok{background:var(--gnb);color:var(--gn)}.tag.w{background:var(--wab);color:var(--wa)}.tag.r{background:var(--rdb);color:var(--rd)}
+.bar{height:9px;background:var(--br);border-radius:9px;overflow:hidden;margin:10px 0 6px}
+.bar i{display:block;height:100%;background:var(--pr)}
+.bar i.w{background:var(--wa)}.bar i.r{background:var(--rd)}
+.st{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--br)}
+.st:last-child{border:0}
+.st.ab{color:var(--wa);font-weight:700}
+.tot{display:flex;justify-content:space-between;font-weight:700;padding-top:8px;margin-top:4px;border-top:2px solid var(--br)}
+.mu{color:var(--mu);font-size:13px}
+.empty{text-align:center;color:var(--mu);padding:18px 0}
+.sec-t{font-weight:700;margin:16px 4px 8px;color:var(--mu);font-size:14px}
+.page{display:none}.page.on{display:block}
+#toast{position:fixed;bottom:calc(90px + env(safe-area-inset-bottom,0px));left:12px;right:12px;max-width:600px;margin:auto;background:#1b2430;color:#fff;padding:12px 14px;border-radius:12px;font-weight:700;z-index:9;display:none}
+#toast.w{background:#b45309}#toast.r{background:#b91c1c}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+<header><img src="logo.png" alt="التوحيد إيجيبت"><span>مخزن الصباغة</span></header>
+<main>
+  <div id="alerts"></div>
+
+  <!-- التقرير اليومي -->
+  <section class="page on" id="p-daily">
+    <div class="card">
+      <h2>تسجيل حركة</h2>
+      <label>التاريخ</label>
+      <input type="date" id="fDate">
+      <label>نوع الحركة</label>
+      <div class="seg">
+        <label><input type="radio" name="dir" value="in" checked><span class="in">⬇ وارد للمخزن</span></label>
+        <label><input type="radio" name="dir" value="out"><span class="out">⬆ صادر للمصبغة</span></label>
+      </div>
+      <label>الصنف</label>
+      <select id="fKind">
+        <option value="sand">ساندوتش</option>
+        <option value="fest">فستونة</option>
+        <option value="jac">جاكار</option>
+      </select>
+      <label id="fRefL">المقاس</label>
+      <select id="fRef"></select>
+      <div class="row">
+        <div><label>عدد الأحواض</label><input type="number" id="fN" inputmode="numeric" min="1" placeholder="0"></div>
+        <div><label>وزن الحوض (كجم)</label><input type="number" id="fW" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+      </div>
+      <div class="row">
+        <div><label>اللوط (اختياري)</label><input type="text" id="fLot" inputmode="numeric"></div>
+        <div><label>ملاحظات (اختياري)</label><input type="text" id="fNote"></div>
+      </div>
+      <button id="addBtn">إضافة للتقرير</button>
+    </div>
+    <div class="card">
+      <div class="hd"><h2 id="dayTitle" style="margin:0">حركة اليوم</h2></div>
+      <div id="dayList"></div>
+      <button class="sec" id="shareBtn">📤 مشاركة / نسخ تقرير اليوم</button>
+    </div>
+  </section>
+
+  <!-- الطلبات -->
+  <section class="page" id="p-orders">
+    <div class="card">
+      <h2>طلبية جديدة (فستونة / جاكار)</h2>
+      <label>النوع</label>
+      <select id="oKind"><option value="fest">فستونة</option><option value="jac">جاكار</option></select>
+      <label>اسم الطلبية / العميل</label>
+      <input type="text" id="oName" placeholder="مثال: ليفورا">
+      <div class="row">
+        <div><label>عدد الأحواض المطلوب</label><input type="number" id="oTotal" inputmode="numeric" min="1"></div>
+        <div><label>وزن الحوض (كجم)</label><input type="number" id="oW" inputmode="decimal" min="0" step="any"></div>
+      </div>
+      <button id="addOrder">إضافة الطلبية</button>
+    </div>
+    <div id="orderList"></div>
+  </section>
+
+  <!-- المخزن -->
+  <section class="page" id="p-stock">
+    <div id="stockView"></div>
+  </section>
+
+  <!-- الإعدادات -->
+  <section class="page" id="p-more">
+    <div class="card">
+      <h2>التنبيه قبل انتهاء الطلبية</h2>
+      <label>نبّهني لما يتبقى (حوض) أو أقل</label>
+      <input type="number" id="sWarn" inputmode="numeric" min="0">
+      <button class="sec" id="saveWarn">حفظ</button>
+    </div>
+    <div class="card">
+      <h2>نسخة احتياطية</h2>
+      <p class="mu">البيانات محفوظة على هذا الموبايل فقط. خد نسخة بشكل دوري عشان لو مسحت بيانات المتصفح أو غيرت الموبايل.</p>
+      <button id="exportBtn">⬇ تحميل نسخة احتياطية</button>
+      <button class="sec" id="importBtn">⬆ استرجاع من نسخة</button>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+    </div>
+    <div class="card">
+      <button class="dng" id="wipeBtn" style="margin:0">مسح كل البيانات</button>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+<nav>
+  <a data-p="daily" class="on"><b>📝</b>التقرير اليومي</a>
+  <a data-p="orders"><b>📋</b>الطلبات</a>
+  <a data-p="stock"><b>🏭</b>المخزن</a>
+  <a data-p="more"><b>⚙️</b>الإعدادات</a>
+</nav>
+
+<script>
+const KEY='dyeing-app-v1';
+const SIZES=['1','1.8','2','2.2','2.5','2.8'];
+const KIND={sand:'ساندوتش',fest:'فستونة',jac:'جاكار'};
+const $=id=>document.getElementById(id);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>Math.round(v*100)/100;
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const fmtD=iso=>{const [y,m,d]=iso.split('-');return +d+'/'+ +m+'/'+y};
+
+let S=load();
+function blank(){return{orders:[],entries:[],settings:{warn:3,sandW:20}}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.orders?s:blank()}catch(e){return blank()}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('تعذر الحفظ على الجهاز','r')}}
+function toast(msg,cls=''){const t=$('toast');t.textContent=msg;t.className=cls;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',cls?5000:2200)}
+
+/* ---------- حسابات ---------- */
+function orderStats(o){
+  let inN=0,outN=0;
+  S.entries.forEach(e=>{if(e.ref===o.id){e.dir==='in'?inN+=e.n:outN+=e.n}});
+  const rem=o.total-inN;
+  let lvl='ok';
+  if(!o.done){ if(rem<=0)lvl='r'; else if(rem<=S.settings.warn)lvl='w'; }
+  return{inN,outN,rem,lvl};
+}
+function stockOf(ref){
+  const m={};
+  S.entries.forEach(e=>{if(e.ref===ref){m[e.w]=(m[e.w]||0)+(e.dir==='in'?e.n:-e.n)}});
+  return Object.keys(m).map(w=>({w:+w,n:m[w]})).filter(x=>x.n!==0).sort((a,b)=>b.w-a.w);
+}
+const orderName=o=>KIND[o.kind]+' '+o.name;
+const refName=e=>{if(e.kind==='sand')return 'ساندوتش '+e.ref+'سم';const o=S.orders.find(x=>x.id===e.ref);return o?orderName(o):'(طلبية محذوفة)'};
+
+/* ---------- التنقل ---------- */
+function go(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));
+  document.querySelectorAll('nav a').forEach(x=>x.classList.toggle('on',x.dataset.p===p));
+  if(p==='stock')renderStock(); if(p==='orders')renderOrders(); if(p==='daily')renderDay(); if(p==='more')$('sWarn').value=S.settings.warn;
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('nav a').forEach(a=>a.onclick=()=>go(a.dataset.p));
+
+/* ---------- التنبيهات ---------- */
+function renderAlerts(){
+  const out=[];
+  S.orders.filter(o=>!o.done).forEach(o=>{
+    const s=orderStats(o);
+    if(s.rem<0) out.push(`<div class="alert r">🛑 ${esc(orderName(o))}: الوارد زاد عن المطلوب بـ ${-s.rem} حوض</div>`);
+    else if(s.rem===0) out.push(`<div class="alert r">🛑 ${esc(orderName(o))}: الطلبية اكتملت — أوقف الماكينة</div>`);
+    else if(s.lvl==='w') out.push(`<div class="alert w">⚠️ ${esc(orderName(o))}: باقي ${s.rem} حوض فقط — جهّز لإيقاف الماكينة</div>`);
+  });
+  $('alerts').innerHTML=out.join('');
+}
+
+/* ---------- التقرير اليومي ---------- */
+function fillRef(){
+  const k=$('fKind').value, sel=$('fRef');
+  if(k==='sand'){
+    $('fRefL').textContent='المقاس';
+    sel.innerHTML=SIZES.map(s=>`<option value="${s}">${s} سم</option>`).join('');
+  }else{
+    $('fRefL').textContent='الطلبية';
+    const os=S.orders.filter(o=>o.kind===k&&!o.done);
+    sel.innerHTML=os.length?os.map(o=>`<option value="${o.id}">${esc(o.name)}</option>`).join(''):'<option value="">— أضف طلبية من صفحة الطلبات —</option>';
+  }
+  fillW();
+}
+function fillW(){
+  const k=$('fKind').value;
+  if(k==='sand')$('fW').value=S.settings.sandW||'';
+  else{const o=S.orders.find(x=>x.id===$('fRef').value);$('fW').value=o?o.w:''}
+}
+$('fKind').onchange=fillRef; $('fRef').onchange=fillW; $('fDate').onchange=renderDay;
+$('fDate').value=today();
+
+$('addBtn').onclick=()=>{
+  const kind=$('fKind').value, ref=$('fRef').value, n=parseInt($('fN').value), w=parseFloat($('fW').value);
+  const dir=document.querySelector('input[name=dir]:checked').value;
+  if(!ref){toast('اختار الطلبية الأول','r');return}
+  if(!(n>0)){toast('اكتب عدد الأحواض','r');return}
+  if(!(w>0)){toast('اكتب وزن الحوض','r');return}
+  if(!$('fDate').value){toast('اختار التاريخ','r');return}
+  S.entries.push({id:uid(),date:$('fDate').value,dir,kind,ref,n,w,lot:$('fLot').value.trim(),note:$('fNote').value.trim()});
+  if(kind==='sand')S.settings.sandW=w;
+  save();
+  $('fN').value='';$('fNote').value='';$('fLot').value='';
+  renderDay();renderAlerts();
+  if(kind!=='sand'&&dir==='in'){
+    const o=S.orders.find(x=>x.id===ref),s=orderStats(o);
+    if(s.rem<0)toast(`🛑 زاد عن المطلوب بـ ${-s.rem} حوض`,'r');
+    else if(s.rem===0)toast('🛑 الطلبية اكتملت — أوقف الماكينة','r');
+    else if(s.lvl==='w')toast(`⚠️ باقي ${s.rem} حوض فقط على انتهاء الطلبية`,'w');
+    else toast(`تمت الإضافة — باقي ${s.rem} حوض`);
+  }else toast('تمت الإضافة');
+  $('fN').focus();
+};
+
+function dayEntries(){return S.entries.filter(e=>e.date===$('fDate').value)}
+function line(e){return `${esc(refName(e))} — ${e.n} حوض × ${num(e.w)} كجم = ${num(e.n*e.w)} كجم`}
+function renderDay(){
+  const d=$('fDate').value;
+  $('dayTitle').textContent='حركة يوم '+(d?fmtD(d):'');
+  const es=dayEntries();
+  if(!es.length){$('dayList').innerHTML='<div class="empty">لا توجد حركة في هذا اليوم</div>';return}
+  const sum=dir=>es.filter(e=>e.dir===dir).reduce((a,e)=>({n:a.n+e.n,kg:a.kg+e.n*e.w}),{n:0,kg:0});
+  const i=sum('in'),o=sum('out');
+  $('dayList').innerHTML=es.slice().reverse().map(e=>`
+    <div class="item"><div><span class="tag ${e.dir}">${e.dir==='in'?'وارد':'صادر'}</span> ${line(e)}
+    ${(e.lot||e.note)?`<small>${e.lot?'لوط '+esc(e.lot)+' ':''}${esc(e.note)}</small>`:''}</div>
+    <button class="dng sm" data-del="${e.id}">حذف</button></div>`).join('')
+    +`<div class="tot"><span>إجمالي الوارد</span><span>${i.n} حوض — ${num(i.kg)} كجم</span></div>`
+    +(o.n?`<div class="tot" style="border:0;margin:0"><span>إجمالي الصادر</span><span>${o.n} حوض — ${num(o.kg)} كجم</span></div>`:'');
+  $('dayList').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    if(confirm('حذف هذه الحركة؟')){S.entries=S.entries.filter(x=>x.id!==b.dataset.del);save();renderDay();renderAlerts()}
+  });
+}
+$('shareBtn').onclick=async()=>{
+  const es=dayEntries();if(!es.length){toast('مفيش حركة نشاركها','r');return}
+  const plain=e=>line(e).replace(/&amp;|&lt;|&gt;/g,'');
+  let t='تقرير المخزن — '+fmtD($('fDate').value)+'\n';
+  [['in','الوارد للمخزن'],['out','الصادر للمصبغة']].forEach(([d,l])=>{
+    const x=es.filter(e=>e.dir===d);
+    if(x.length){t+='\n'+l+':\n'+x.map(e=>'• '+plain(e)).join('\n')+'\n'}
+  });
+  try{ if(navigator.share){await navigator.share({text:t});return} }catch(e){if(e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(t);toast('تم نسخ التقرير')}catch(e){prompt('انسخ التقرير:',t)}
+};
+
+/* ---------- الطلبات ---------- */
+$('addOrder').onclick=()=>{
+  const kind=$('oKind').value,name=$('oName').value.trim(),total=parseInt($('oTotal').value),w=parseFloat($('oW').value);
+  if(!name){toast('اكتب اسم الطلبية','r');return}
+  if(!(total>0)){toast('اكتب عدد الأحواض المطلوب','r');return}
+  if(!(w>0)){toast('اكتب وزن الحوض','r');return}
+  S.orders.push({id:uid(),kind,name,total,w,done:false,created:today()});
+  save();$('oName').value='';$('oTotal').value='';$('oW').value='';
+  renderOrders();renderAlerts();fillRef();toast('تمت إضافة الطلبية');
+};
+function orderCard(o){
+  const s=orderStats(o),pct=Math.min(100,Math.round(s.inN/o.total*100));
+  const tag=o.done?'<span class="tag ok">مغلقة</span>':s.rem<0?`<span class="tag r">زيادة ${-s.rem}</span>`:s.rem===0?'<span class="tag r">اكتملت</span>':s.lvl==='w'?`<span class="tag w">باقي ${s.rem}</span>`:`<span class="tag ok">باقي ${s.rem}</span>`;
+  return `<div class="card"><div class="hd"><h3>${esc(orderName(o))}</h3>${tag}</div>
+    <div class="bar"><i class="${s.lvl==='ok'?'':s.lvl}" style="width:${pct}%"></i></div>
+    <div class="mu">وارد ${s.inN} من ${o.total} حوض • وزن الحوض ${num(o.w)} كجم</div>
+    <div class="row" style="margin-top:12px">
+      <button class="sec sm" style="margin:0" data-edit="${o.id}">تعديل</button>
+      <button class="sec sm" style="margin:0" data-done="${o.id}">${o.done?'إعادة فتح':'إغلاق'}</button>
+      <button class="dng sm" style="margin:0" data-rm="${o.id}">حذف</button></div></div>`;
+}
+function renderOrders(){
+  const a=S.orders.filter(o=>!o.done),d=S.orders.filter(o=>o.done);
+  let h='';
+  if(!S.orders.length)h='<div class="empty">لا توجد طلبيات. أضف أول طلبية من الأعلى.</div>';
+  if(a.length)h+='<div class="sec-t">الطلبيات الجارية</div>'+a.map(orderCard).join('');
+  if(d.length)h+='<div class="sec-t">طلبيات مغلقة</div>'+d.map(orderCard).join('');
+  $('orderList').innerHTML=h;
+  $('orderList').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{
+    const o=S.orders.find(x=>x.id===b.dataset.edit);
+    const t=prompt('عدد الأحواض المطلوب:',o.total);if(t===null)return;
+    const w=prompt('وزن الحوض (كجم):',o.w);if(w===null)return;
+    if(+t>0)o.total=parseInt(t); if(+w>0)o.w=parseFloat(w);
+    save();renderOrders();renderAlerts();
+  });
+  $('orderList').querySelectorAll('[data-done]').forEach(b=>b.onclick=()=>{
+    const o=S.orders.find(x=>x.id===b.dataset.done);o.done=!o.done;save();renderOrders();renderAlerts();fillRef();
+  });
+  $('orderList').querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{
+    const o=S.orders.find(x=>x.id===b.dataset.rm);
+    if(confirm(`حذف الطلبية "${orderName(o)}" وكل حركاتها؟`)){
+      S.orders=S.orders.filter(x=>x.id!==o.id);S.entries=S.entries.filter(e=>e.ref!==o.id);
+      save();renderOrders();renderAlerts();fillRef();
+    }
+  });
+}
+
+/* ---------- المخزن ---------- */
+function stockCard(title,ref,o){
+  const st=stockOf(ref);
+  const totN=st.reduce((a,x)=>a+x.n,0),totKg=st.reduce((a,x)=>a+x.n*x.w,0);
+  let head='',body='';
+  if(o){
+    const s=orderStats(o);
+    head=o.done?'<span class="tag ok">مغلقة</span>':s.rem<0?`<span class="tag r">زيادة ${-s.rem}</span>`:s.rem===0?'<span class="tag r">اكتملت</span>':s.lvl==='w'?`<span class="tag w">باقي ${s.rem}</span>`:`<span class="tag ok">باقي ${s.rem}</span>`;
+    body=`<div class="mu" style="margin-bottom:6px">وارد ${s.inN} من ${o.total} حوض</div>`;
+  }
+  if(!st.length)body+='<div class="mu">لا يوجد رصيد في المخزن</div>';
+  else{
+    body+=st.map(x=>{
+      const ab=o&&x.w!==o.w;
+      return `<div class="st ${ab?'ab':''}"><span>${x.n<0?'⚠ ':''}${x.n} حوض بوزن ${num(x.w)}${ab?' ⚠ غير المعتاد ('+num(o.w)+')':''}</span><span>${num(x.n*x.w)} كجم</span></div>`}).join('');
+    body+=`<div class="tot"><span>الإجمالي</span><span>${totN} حوض — ${num(totKg)} كجم</span></div>`;
+  }
+  return `<div class="card"><div class="hd"><h3>${esc(title)}</h3>${head}</div><div style="margin-top:8px">${body}</div></div>`;
+}
+function renderStock(){
+  let h='<div class="sec-t">ساندوتش</div>';
+  SIZES.forEach(s=>h+=stockCard(s+' سم',s));
+  [['fest','فستونة'],['jac','جاكار']].forEach(([k,l])=>{
+    const os=S.orders.filter(o=>o.kind===k&&(!o.done||stockOf(o.id).length));
+    h+=`<div class="sec-t">${l}</div>`;
+    h+=os.length?os.map(o=>stockCard(o.name,o.id,o)).join(''):'<div class="card empty">لا توجد طلبيات</div>';
+  });
+  $('stockView').innerHTML=h;
+}
+
+/* ---------- الإعدادات ---------- */
+$('saveWarn').onclick=()=>{const v=parseInt($('sWarn').value);if(v>=0){S.settings.warn=v;save();renderAlerts();toast('تم الحفظ')}};
+$('exportBtn').onclick=()=>{
+  const b=new Blob([JSON.stringify(S)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='sabagha-backup-'+today()+'.json';a.click();
+};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{
+    try{const d=JSON.parse(r.result);if(!d.orders||!d.entries)throw 0;
+      if(confirm('سيتم استبدال البيانات الحالية بالنسخة. متأكد؟')){S=d;S.settings=S.settings||{warn:3,sandW:20};save();go('daily');renderAlerts();fillRef();toast('تم الاسترجاع')}
+    }catch(x){toast('الملف غير صالح','r')}
+  };r.readAsText(f);e.target.value='';
+};
+$('wipeBtn').onclick=()=>{if(confirm('هتتمسح كل البيانات نهائيًا. متأكد؟')&&confirm('تأكيد أخير: مسح الكل؟')){S=blank();save();go('daily');renderAlerts();fillRef();toast('تم المسح')}};
+
+/* ---------- تشغيل ---------- */
+fillRef();renderDay();renderAlerts();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
